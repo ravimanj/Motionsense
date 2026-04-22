@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp"
+    android:height="36dp"
+    android:viewportWidth="36"
+    android:viewportHeight="36">
+    <!-- Squat figure -->
+    <path android:fillColor="#00E676"
+        android:pathData="M18,3 a3,3 0 1,0 0.01,0 Z"/>
+    <path android:strokeColor="#00E676" android:strokeWidth="2.5"
+        android:pathData="M18,6 L18,16"/>
+    <path android:strokeColor="#00E676" android:strokeWidth="2.5"
+        android:pathData="M12,10 L18,14 L24,10"/>
+    <path android:strokeColor="#00E676" android:strokeWidth="2.5"
+        android:pathData="M18,16 L12,22 L12,30 M18,16 L24,22 L24,30"/>
+</vector>

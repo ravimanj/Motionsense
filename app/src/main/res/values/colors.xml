@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Background -->
+    <color name="bg_primary">#0D0D0F</color>
+    <color name="bg_surface">#1A1A2E</color>
+    <color name="bg_card">#16213E</color>
+    <color name="bg_card_2">#0F3460</color>
+
+    <!-- Accents -->
+    <color name="accent_green">#00E676</color>
+    <color name="accent_green_dark">#00C853</color>
+    <color name="accent_purple">#7C4DFF</color>
+    <color name="accent_purple_dark">#651FFF</color>
+
+    <!-- Status colors -->
+    <color name="feedback_good">#1B5E20</color>
+    <color name="feedback_warning">#E65100</color>
+    <color name="feedback_error">#B71C1C</color>
+    <color name="status_good">#00E676</color>
+    <color name="status_warning">#FFB300</color>
+    <color name="status_error">#FF1744</color>
+
+    <!-- Text -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0B0B0</color>
+    <color name="text_hint">#666666</color>
+    <color name="text_accent">#00E676</color>
+
+    <!-- Chip -->
+    <color name="chip_selected_bg">#00E676</color>
+    <color name="chip_selected_text">#000000</color>
+    <color name="chip_unselected_bg">#1E1E2E</color>
+    <color name="chip_unselected_text">#B0B0B0</color>
+    <color name="chip_border">#333355</color>
+
+    <!-- Misc -->
+    <color name="divider">#222244</color>
+    <color name="transparent">#00000000</color>
+    <color name="overlay_dark">#99000000</color>
+    <color name="stage_up">#00E676</color>
+    <color name="stage_down">#7C4DFF</color>
+</resources>

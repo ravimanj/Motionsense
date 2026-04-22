@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp"
+    android:height="36dp"
+    android:viewportWidth="36"
+    android:viewportHeight="36">
+    <!-- Push up figure -->
+    <path android:fillColor="#00E676"
+        android:pathData="M8,12 a3,3 0 1,0 0.01,0 Z"/>
+    <path android:strokeColor="#00E676" android:strokeWidth="2.5"
+        android:pathData="M8,15 L8,22 L28,22"/>
+    <path android:strokeColor="#00E676" android:strokeWidth="2.5"
+        android:pathData="M8,22 L6,28 M28,22 L30,28"/>
+    <path android:strokeColor="#00E676" android:strokeWidth="2"
+        android:pathData="M8,18 L4,20 M8,18 L12,20"/>
+</vector>

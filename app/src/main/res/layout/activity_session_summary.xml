@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_dark_gradient"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="40dp">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="48dp"
+            android:paddingBottom="24dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Great Job! 🎉"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary" />
+
+            <TextView
+                android:id="@+id/tvExerciseName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Bicep Curl · Session Complete"
+                android:textSize="14sp"
+                android:textColor="@color/accent_green" />
+
+            <!-- Big Rep Number -->
+            <TextView
+                android:id="@+id/tvBigReps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="10"
+                android:textSize="88sp"
+                android:textStyle="bold"
+                android:textColor="@color/accent_green" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="REPS COMPLETED"
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary"
+                android:letterSpacing="0.1" />
+
+        </LinearLayout>
+
+        <!-- 6-cell Stats Grid -->
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="3"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="20dp">
+
+            <!-- Stat cells: Total, Correct, Incorrect, Accuracy, Calories, Time -->
+            <LinearLayout android:layout_width="0dp" android:layout_height="80dp"
+                android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center"
+                android:background="@drawable/bg_card" android:layout_margin="6dp">
+                <TextView android:id="@+id/tvTotalReps" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="10" android:textSize="24sp" android:textStyle="bold" android:textColor="@color/text_primary" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Total" android:textSize="11sp" android:textColor="@color/text_secondary" />
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="80dp"
+                android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center"
+                android:background="@drawable/bg_card" android:layout_margin="6dp">
+                <TextView android:id="@+id/tvCorrectReps" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="8" android:textSize="24sp" android:textStyle="bold" android:textColor="@color/status_good" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Correct" android:textSize="11sp" android:textColor="@color/text_secondary" />
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="80dp"
+                android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center"
+                android:background="@drawable/bg_card" android:layout_margin="6dp">
+                <TextView android:id="@+id/tvIncorrectReps" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="2" android:textSize="24sp" android:textStyle="bold" android:textColor="@color/status_error" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Incorrect" android:textSize="11sp" android:textColor="@color/text_secondary" />
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="80dp"
+                android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center"
+                android:background="@drawable/bg_card" android:layout_margin="6dp">
+                <TextView android:id="@+id/tvAccuracy" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="80%" android:textSize="24sp" android:textStyle="bold" android:textColor="@color/status_warning" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Accuracy" android:textSize="11sp" android:textColor="@color/text_secondary" />
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="80dp"
+                android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center"
+                android:background="@drawable/bg_card" android:layout_margin="6dp">
+                <TextView android:id="@+id/tvCalories" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="3.1" android:textSize="24sp" android:textStyle="bold" android:textColor="@color/accent_purple" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Calories" android:textSize="11sp" android:textColor="@color/text_secondary" />
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="80dp"
+                android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center"
+                android:background="@drawable/bg_card" android:layout_margin="6dp">
+                <TextView android:id="@+id/tvTime" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="40s" android:textSize="24sp" android:textStyle="bold" android:textColor="@color/accent_green" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Time" android:textSize="11sp" android:textColor="@color/text_secondary" />
+            </LinearLayout>
+
+        </GridLayout>
+
+        <!-- Muscles Worked -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="@color/bg_card"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="16dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="💪 Muscles Worked"
+                    android:textSize="14sp" android:textStyle="bold" android:textColor="@color/text_primary"
+                    android:paddingBottom="6dp" />
+                <TextView android:id="@+id/tvMuscles"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Biceps · Forearms"
+                    android:textSize="14sp" android:textColor="@color/accent_green" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Form Errors -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="24dp"
+            app:cardBackgroundColor="@color/bg_card"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="16dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="⚠️ Form Analysis"
+                    android:textSize="14sp" android:textStyle="bold" android:textColor="@color/text_primary"
+                    android:paddingBottom="6dp" />
+                <TextView android:id="@+id/tvFormErrors"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="✅ Perfect Form — No errors!"
+                    android:textSize="14sp" android:textColor="@color/status_good" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Buttons -->
+        <Button
+            android:id="@+id/btnAnotherSet"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="12dp"
+            android:text="Do Another Set"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/bg_primary"
+            android:background="@drawable/bg_button_primary"
+            android:stateListAnimator="@null" />
+
+        <Button
+            android:id="@+id/btnBackToHome"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="Back to Home"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/accent_green"
+            android:background="@drawable/bg_card_accent"
+            android:stateListAnimator="@null" />
+
+    </LinearLayout>
+</ScrollView>

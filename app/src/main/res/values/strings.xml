@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MotionSense AI</string>
+    <string name="app_tagline">AI-Powered Home Fitness Trainer</string>
+    <string name="start_training">Start Training</string>
+    <string name="select_exercise">Select Exercise</string>
+    <string name="workout_setup">Workout Setup</string>
+    <string name="live_tracker">Live Tracker</string>
+    <string name="session_summary">Session Summary</string>
+
+    <!-- Exercise names -->
+    <string name="bicep_curl">Bicep Curl</string>
+    <string name="push_up">Push Up</string>
+    <string name="squat">Squat</string>
+    <string name="shoulder_press">Shoulder Press</string>
+
+    <!-- Exercise muscles -->
+    <string name="muscles_bicep">Biceps · Forearms</string>
+    <string name="muscles_pushup">Chest · Triceps · Shoulders</string>
+    <string name="muscles_squat">Quads · Glutes · Hamstrings</string>
+    <string name="muscles_shoulder">Shoulders · Triceps · Core</string>
+
+    <!-- Setup screen -->
+    <string name="select_reps">Select Reps</string>
+    <string name="select_weight">Select Weight (kg)</string>
+    <string name="start_session">Start Session 💪</string>
+    <string name="target_reps">Target Reps</string>
+    <string name="weight_kg">Weight (kg)</string>
+    <string name="bodyweight">Bodyweight</string>
+
+    <!-- Live tracker -->
+    <string name="connecting">Connecting to AI server…</string>
+    <string name="no_person">No person detected — adjust camera</string>
+    <string name="live_badge">● LIVE</string>
+    <string name="stop_session">■ Stop</string>
+    <string name="reps_label">REPS</string>
+    <string name="correct_label">CORRECT</string>
+    <string name="incorrect_label">INCORRECT</string>
+    <string name="accuracy_label">ACCURACY</string>
+
+    <!-- Summary screen -->
+    <string name="great_job">Great Job! 🎉</string>
+    <string name="total_reps">Total Reps</string>
+    <string name="correct_reps">Correct</string>
+    <string name="incorrect_reps">Incorrect</string>
+    <string name="accuracy">Accuracy</string>
+    <string name="calories_burned">Calories</string>
+    <string name="time_spent">Time</string>
+    <string name="muscles_worked">Muscles Worked</string>
+    <string name="form_errors_title">Form Errors Detected</string>
+    <string name="no_form_errors">✅ Perfect Form — No errors!</string>
+    <string name="do_another_set">Do Another Set</string>
+    <string name="back_to_home">Back to Home</string>
+
+    <!-- Tech badges -->
+    <string name="badge_mediapipe">MediaPipe</string>
+    <string name="badge_fastapi">FastAPI</string>
+    <string name="badge_opencv">OpenCV</string>
+    <string name="badge_ai">AI Powered</string>
+
+    <!-- Errors -->
+    <string name="camera_permission_denied">Camera permission is required for pose detection.</string>
+    <string name="connection_error">Cannot connect to AI server. Check your internet connection.</string>
+</resources>

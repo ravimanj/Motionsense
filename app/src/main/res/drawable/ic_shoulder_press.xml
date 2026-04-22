@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp"
+    android:height="36dp"
+    android:viewportWidth="36"
+    android:viewportHeight="36">
+    <!-- Shoulder press: arms overhead -->
+    <path android:fillColor="#00E676"
+        android:pathData="M18,3 a3,3 0 1,0 0.01,0 Z"/>
+    <path android:strokeColor="#00E676" android:strokeWidth="2.5"
+        android:pathData="M18,6 L18,20"/>
+    <path android:strokeColor="#00E676" android:strokeWidth="2.5"
+        android:pathData="M10,14 L14,10 L18,12 L22,10 L26,14"/>
+    <path android:strokeColor="#00E676" android:strokeWidth="2"
+        android:pathData="M18,20 L14,30 M18,20 L22,30"/>
+    <path android:strokeColor="#00E676" android:strokeWidth="2"
+        android:pathData="M10,14 L8,6 M26,14 L28,6"/>
+</vector>

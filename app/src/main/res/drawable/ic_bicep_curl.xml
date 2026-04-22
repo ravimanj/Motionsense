@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp"
+    android:height="36dp"
+    android:viewportWidth="36"
+    android:viewportHeight="36">
+    <!-- Bicep curl: arm raised stick figure -->
+    <path android:fillColor="#00E676"
+        android:pathData="M18,4 a3,3 0 1,0 0.01,0 Z"/>
+    <path android:strokeColor="#00E676" android:strokeWidth="2.5"
+        android:pathData="M18,7 L18,18 L12,26"/>
+    <path android:strokeColor="#00E676" android:strokeWidth="2.5"
+        android:pathData="M18,12 L24,8 L26,4"/>
+    <path android:strokeColor="#00E676" android:strokeWidth="2"
+        android:pathData="M18,18 L14,28 M18,18 L22,28"/>
+</vector>
