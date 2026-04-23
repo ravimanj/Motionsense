@@ -27,6 +27,25 @@ data class SessionResponse(val id: Int, @SerializedName("exercise_type") val exe
 data class DailyLogToggle(val date: String, val completed: Boolean)
 data class DailyLogResponse(val date: String, val completed: Boolean)
 
+data class WorkoutPlanUpdate(
+    @SerializedName("bicep_curl") val bicepCurl: Int,
+    val squat: Int,
+    @SerializedName("push_up") val pushUp: Int,
+    @SerializedName("shoulder_press") val shoulderPress: Int
+)
+
+data class DailyProgressItem(
+    @SerializedName("exercise_type") val exerciseType: String,
+    @SerializedName("target_reps") val targetReps: Int,
+    @SerializedName("completed_reps") val completedReps: Int
+)
+
+data class DailyProgressResponse(
+    val date: String,
+    @SerializedName("is_fully_completed") val isFullyCompleted: Boolean,
+    val progress: List<DailyProgressItem>
+)
+
 // --- API Interface ---
 interface MotionSenseApi {
     @POST("auth/send-otp")
@@ -49,6 +68,12 @@ interface MotionSenseApi {
 
     @GET("daily-logs/{date}")
     suspend fun getDailyLog(@Path("date") date: String): DailyLogResponse
+
+    @POST("workout-plan")
+    suspend fun updateWorkoutPlan(@Body plan: WorkoutPlanUpdate): WorkoutPlanUpdate
+
+    @GET("daily-progress/{date}")
+    suspend fun getDailyProgress(@Path("date") date: String): DailyProgressResponse
 }
 
 // --- Retrofit Client ---

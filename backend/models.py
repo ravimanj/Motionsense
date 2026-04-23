@@ -42,3 +42,13 @@ class DailyLog(Base):
     completed = Column(Boolean, default=False)
 
     owner = relationship("User", back_populates="daily_logs")
+
+class WorkoutPlan(Base):
+    __tablename__ = "workout_plans"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    exercise_type = Column(String, index=True)
+    target_reps = Column(Integer, default=0)
+
+    owner = relationship("User")

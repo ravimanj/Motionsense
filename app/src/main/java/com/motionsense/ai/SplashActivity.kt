@@ -16,6 +16,12 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        RetrofitClient.init(this)
+        if (RetrofitClient.getToken() != null) {
+            startActivity(Intent(this, DashboardActivity::class.java))
+            finish()
+            return
+        }
 
         // Animate logo slide-in + fade-in
         val fadeIn = AlphaAnimation(0f, 1f).apply { duration = 900 }

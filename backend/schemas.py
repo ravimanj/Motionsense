@@ -52,3 +52,19 @@ class DailyLogResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class WorkoutPlanUpdate(BaseModel):
+    bicep_curl: int
+    squat: int
+    push_up: int
+    shoulder_press: int
+
+class DailyProgressItem(BaseModel):
+    exercise_type: str
+    target_reps: int
+    completed_reps: int
+
+class DailyProgressResponse(BaseModel):
+    date: str
+    is_fully_completed: bool
+    progress: List[DailyProgressItem]

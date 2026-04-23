@@ -36,6 +36,9 @@
             android:name=".DashboardActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".WorkoutPlanActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".SetupActivity"
             android:screenOrientation="portrait" />
         <activity

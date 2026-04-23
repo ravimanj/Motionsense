@@ -49,21 +49,14 @@ class DashboardActivity : AppCompatActivity() {
             startActivity(Intent(this, ExerciseSelectActivity::class.java))
         }
 
-        binding.cbDailyGoal.setOnCheckedChangeListener { _, isChecked ->
-            lifecycleScope.launch {
-                try {
-                    val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                    RetrofitClient.api.toggleDailyLog(DailyLogToggle(today, isChecked))
-                } catch (e: Exception) {
-                    // Revert visually on error
-                }
-            }
+        binding.btnEditPlan.setOnClickListener {
+            startActivity(Intent(this, WorkoutPlanActivity::class.java))
         }
     }
 
     override fun onResume() {
         super.onResume()
-        // Refresh when coming back from an exercise
+        // Refresh when coming back from an exercise or edit plan
         loadDashboardData()
     }
 
@@ -76,10 +69,35 @@ class DashboardActivity : AppCompatActivity() {
     private fun loadDashboardData() {
         lifecycleScope.launch {
             try {
-                // Load Daily Checkbox
+                // Load Daily Progress
                 val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                val dailyLog = RetrofitClient.api.getDailyLog(today)
-                binding.cbDailyGoal.isChecked = dailyLog.completed
+                val progressData = RetrofitClient.api.getDailyProgress(today)
+                
+                binding.containerProgressBars.removeAllViews()
+                
+                if (progressData.progress.isEmpty()) {
+                    binding.containerProgressBars.addView(binding.tvEmptyPlan)
+                } else {
+                    for (item in progressData.progress) {
+                        if (item.targetReps > 0) {
+                            val itemView = createProgressView(item.exerciseType, item.completedReps, item.targetReps)
+                            binding.containerProgressBars.addView(itemView)
+                        }
+                    }
+                    if (binding.containerProgressBars.childCount == 0) {
+                        binding.containerProgressBars.addView(binding.tvEmptyPlan)
+                    }
+                }
+                
+                // Show celebration popup if completed
+                if (progressData.isFullyCompleted) {
+                    val prefs = getSharedPreferences("MotionSensePrefs", MODE_PRIVATE)
+                    val lastCongrats = prefs.getString("last_congrats_date", "")
+                    if (lastCongrats != today) {
+                        prefs.edit().putString("last_congrats_date", today).apply()
+                        showCongratulatoryPopup()
+                    }
+                }
 
                 // Load History
                 val sessions = RetrofitClient.api.getSessions()
@@ -91,6 +109,24 @@ class DashboardActivity : AppCompatActivity() {
                 // Handle error
             }
         }
+    }
+    
+    private fun createProgressView(type: String, completed: Int, target: Int): View {
+        val view = LayoutInflater.from(this).inflate(android.R.layout.simple_list_item_1, binding.containerProgressBars, false)
+        val tv = view.findViewById<TextView>(android.R.id.text1)
+        tv.setTextColor(resources.getColor(R.color.text_primary, null))
+        val typeName = type.replace("_", " ").capitalize()
+        val percent = if (target > 0) (completed * 100) / target else 100
+        tv.text = "$typeName: $completed / $target ($percent%)"
+        return view
+    }
+    
+    private fun showCongratulatoryPopup() {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Target Reached! 🎉")
+            .setMessage("Congratulations! You have successfully completed today’s workout. Keep up the great work!")
+            .setPositiveButton("Awesome") { dialog, _ -> dialog.dismiss() }
+            .show()
     }
 
     inner class HistoryAdapter(private val sessions: List<SessionResponse>) : 
