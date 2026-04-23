@@ -104,6 +104,7 @@ class SetupActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun showScanDialog() {
         val bleManager = com.motionsense.ai.network.BleHeartRateManager.getInstance(this)
         val adapter = android.widget.ArrayAdapter<String>(this, android.R.layout.simple_list_item_1)
@@ -122,10 +123,9 @@ class SetupActivity : AppCompatActivity() {
             val mac = device.address
             if (!deviceMap.containsKey(mac)) {
                 deviceMap[mac] = device
-                @SuppressLint("MissingPermission")
                 val name = device.name ?: "Unknown Monitor"
                 adapter.add("$name - $mac")
-                adapter.notifyDataSetDataSetChanged()
+                adapter.notifyDataSetChanged()
             }
         }
         
