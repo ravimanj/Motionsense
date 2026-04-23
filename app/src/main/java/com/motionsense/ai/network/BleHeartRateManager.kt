@@ -108,11 +108,6 @@ class BleHeartRateManager private constructor(private val context: Context) {
         if (isScanning) return
         
         val scanner = bluetoothAdapter.bluetoothLeScanner ?: return
-        
-        // Filter only Heart Rate Service devices
-        val filter = ScanFilter.Builder()
-            .setServiceUuid(ParcelUuid(HR_SERVICE_UUID))
-            .build()
             
         val settings = ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
@@ -120,7 +115,8 @@ class BleHeartRateManager private constructor(private val context: Context) {
 
         isScanning = true
         _connectionState.value = "Scanning..."
-        scanner.startScan(listOf(filter), settings, scanCallback)
+        // Pass null for filters to discover all nearby BLE devices (fixes issues with smartwatches like Amazfit)
+        scanner.startScan(null, settings, scanCallback)
         
         // Stop scan after 10 seconds
         handler.postDelayed({ stopScan() }, 10000)
