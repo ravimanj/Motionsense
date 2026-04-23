@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 class AuthActivity : AppCompatActivity() {
 
-    private lateinit binding: ActivityAuthBinding
+    private lateinit var binding: ActivityAuthBinding
     private var isLoginMode = false
     private var isOtpMode = false
     private var currentEmail = ""

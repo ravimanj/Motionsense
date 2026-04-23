@@ -53,8 +53,8 @@ interface MotionSenseApi {
 
 // --- Retrofit Client ---
 object RetrofitClient {
-    // 10.0.2.2 is the localhost alias for Android emulator
-    private const val BASE_URL = "http://10.0.2.2:8000/"
+    // Backend hosted on Render
+    private const val BASE_URL = "https://motionsense.onrender.com/"
 
     private var sharedPrefs: SharedPreferences? = null
 

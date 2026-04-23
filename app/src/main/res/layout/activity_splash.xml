@@ -2,21 +2,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_dark_gradient">
 
     <!-- Background glow effect -->
-    <View
-        android:id="@+id/glowCircle"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:alpha="0.08"
-        android:background="@drawable/bg_pill_green"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="-60dp"
-        android:layout_marginStart="-60dp" />
 
     <!-- Logo container -->
     <LinearLayout
@@ -149,7 +140,6 @@
         android:layout_height="56dp"
         android:layout_marginStart="40dp"
         android:layout_marginEnd="40dp"
-        android:layout_marginBottom="60dp"
         android:text="Start Training 💪"
         android:textSize="17sp"
         android:textStyle="bold"
@@ -167,13 +157,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Log in / Sign up to track your progress"
+        android:textColor="@color/accent_green"
         android:textSize="14sp"
         android:textStyle="bold"
-        android:textColor="@color/accent_green"
-        android:layout_marginBottom="40dp"
+        android:padding="8dp"
         app:layout_constraintBottom_toTopOf="@id/tvVersion"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_marginBottom="32dp" />
 
     <!-- Version footer -->
     <TextView
