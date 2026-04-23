@@ -7,6 +7,7 @@ import android.view.animation.AnimationSet
 import android.view.animation.TranslateAnimation
 import androidx.appcompat.app.AppCompatActivity
 import com.motionsense.ai.databinding.ActivitySplashBinding
+import com.motionsense.ai.network.RetrofitClient
 
 class SplashActivity : AppCompatActivity() {
 
