@@ -8,6 +8,8 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import com.motionsense.ai.databinding.ActivitySetupBinding
 import com.motionsense.ai.model.ExerciseRepository
 import com.motionsense.ai.utils.CalorieCalculator
@@ -79,7 +81,7 @@ class SetupActivity : AppCompatActivity() {
         bleManager.autoReconnect()
         
         // Observe status
-        androidx.lifecycle.lifecycleScope.kotlinx.coroutines.launch {
+        lifecycleScope.launch {
             bleManager.connectionState.collect { state ->
                 binding.tvBleStatus.text = state
             }
