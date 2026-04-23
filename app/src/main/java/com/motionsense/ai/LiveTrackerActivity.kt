@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.util.Base64
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -96,7 +97,7 @@ class LiveTrackerActivity : AppCompatActivity() {
         }
 
         // Observe BLE Heart Rate
-        androidx.lifecycle.lifecycleScope.launchWhenStarted {
+        lifecycleScope.launchWhenStarted {
             com.motionsense.ai.network.BleHeartRateManager.getInstance(this@LiveTrackerActivity).bpm.collect { bpm ->
                 binding.tvBpm.text = if (bpm > 0) bpm.toString() else "--"
                 binding.tvBpm.setTextColor(
