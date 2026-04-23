@@ -3,7 +3,7 @@ package com.motionsense.ai
 object Constants {
     // ─── Backend URL ─────────────────────────────────────────────────────────────
     // Replace with your actual Render.com backend URL (no trailing slash)
-    const val BACKEND_HOST = "motionsense-ai.onrender.com"
+    const val BACKEND_HOST = "motionsense.onrender.com"
     const val WS_BASE_URL  = "wss://$BACKEND_HOST"
 
     // ─── Exercise keys ───────────────────────────────────────────────────────────

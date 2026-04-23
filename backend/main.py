@@ -23,6 +23,13 @@ from exercises.push_up        import PushUpTracker
 from exercises.squat          import SquatTracker
 from exercises.shoulder_press import ShoulderPressTracker
 
+import models
+from database import engine
+from routers import auth, tracking
+
+# Create database tables
+models.Base.metadata.create_all(bind=engine)
+
 # ── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("motionsense")
@@ -40,6 +47,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth.router)
+app.include_router(tracking.router)
 
 # Map URL exercise key → tracker class
 EXERCISE_MAP = {
@@ -124,10 +134,11 @@ async def websocket_endpoint(
                 })
                 continue
 
-            frame = _decode_frame(frame_b64)
+            frame, decode_error = _decode_frame(frame_b64)
             if frame is None:
+                logger.warning(f"Frame decode failed ({exercise}): {decode_error}")
                 await websocket.send_json({
-                    "error":    "Could not decode image — ensure JPEG base64",
+                    "error":    f"Frame decode failed: {decode_error}",
                     "detected": False,
                 })
                 continue
@@ -166,12 +177,28 @@ def _extract_base64(raw: str) -> str:
     return raw   # assume raw base64
 
 
-def _decode_frame(b64: str):
-    """Decode a base64-encoded JPEG into an OpenCV BGR frame."""
+def _decode_frame(b64: str) -> tuple:
+    """
+    Decode a base64-encoded JPEG into an OpenCV BGR frame.
+
+    Returns (frame, None) on success or (None, error_message) on failure.
+    Handles:
+      - Missing base64 padding (Android sometimes omits trailing '=')
+      - URL-safe base64 characters ('-' and '_')
+    """
     try:
-        img_bytes = base64.b64decode(b64)
+        # ── Normalise: URL-safe → standard; add missing '=' padding ──────────
+        b64_clean = b64.replace("-", "+").replace("_", "/")
+        # Pad to a multiple of 4
+        missing = len(b64_clean) % 4
+        if missing:
+            b64_clean += "=" * (4 - missing)
+
+        img_bytes = base64.b64decode(b64_clean, validate=True)
         arr       = np.frombuffer(img_bytes, dtype=np.uint8)
         frame     = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-        return frame  # None if imdecode failed
-    except Exception:
-        return None
+        if frame is None:
+            return None, "imdecode returned None — not a valid JPEG"
+        return frame, None
+    except Exception as exc:
+        return None, str(exc)

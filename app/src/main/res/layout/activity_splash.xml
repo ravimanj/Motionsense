@@ -156,12 +156,28 @@
         android:textColor="@color/bg_primary"
         android:background="@drawable/bg_button_primary"
         android:stateListAnimator="@null"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/tvLoginSignup"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Login / Sign up Button -->
+    <TextView
+        android:id="@+id/tvLoginSignup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Log in / Sign up to track your progress"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/accent_green"
+        android:layout_marginBottom="40dp"
+        app:layout_constraintBottom_toTopOf="@id/tvVersion"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Version footer -->
     <TextView
+        android:id="@+id/tvVersion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="v1.0 · B.Tech Final Year Project"

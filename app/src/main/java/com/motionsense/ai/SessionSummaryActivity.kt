@@ -3,8 +3,12 @@ package com.motionsense.ai
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.motionsense.ai.databinding.ActivitySessionSummaryBinding
 import com.motionsense.ai.utils.CalorieCalculator
+import com.motionsense.ai.network.RetrofitClient
+import com.motionsense.ai.network.SessionCreateRequest
+import kotlinx.coroutines.launch
 
 class SessionSummaryActivity : AppCompatActivity() {
 
@@ -49,6 +53,24 @@ class SessionSummaryActivity : AppCompatActivity() {
         } else {
             val errorText = formErrors.joinToString("\n") { "⚠️ ${it.replaceFirstChar { c -> c.uppercase() }}" }
             binding.tvFormErrors.text = errorText
+        }
+
+        // Save session to backend
+        RetrofitClient.init(this)
+        if (RetrofitClient.getToken() != null) {
+            lifecycleScope.launch {
+                try {
+                    RetrofitClient.api.createSession(
+                        SessionCreateRequest(
+                            exerciseType = exerciseKey,
+                            reps = counter,
+                            weight = weight.toFloat()
+                        )
+                    )
+                } catch (e: Exception) {
+                    // Fail silently, maybe log later
+                }
+            }
         }
 
         // Buttons

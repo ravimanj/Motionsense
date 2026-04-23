@@ -30,6 +30,12 @@
             android:name=".ExerciseSelectActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".AuthActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".DashboardActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".SetupActivity"
             android:screenOrientation="portrait" />
         <activity

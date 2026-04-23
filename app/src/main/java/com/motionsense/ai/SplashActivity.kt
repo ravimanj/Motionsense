@@ -38,6 +38,11 @@ class SplashActivity : AppCompatActivity() {
         binding.btnStartTraining.setOnClickListener {
             goToExerciseSelect()
         }
+
+        binding.tvLoginSignup.setOnClickListener {
+            startActivity(Intent(this, AuthActivity::class.java))
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        }
     }
 
     private fun goToExerciseSelect() {
