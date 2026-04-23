@@ -94,6 +94,16 @@ class LiveTrackerActivity : AppCompatActivity() {
             wsManager?.disconnect()
             navigateToSummary()
         }
+
+        // Observe BLE Heart Rate
+        androidx.lifecycle.lifecycleScope.launchWhenStarted {
+            com.motionsense.ai.network.BleHeartRateManager.getInstance(this@LiveTrackerActivity).bpm.collect { bpm ->
+                binding.tvBpm.text = if (bpm > 0) bpm.toString() else "--"
+                binding.tvBpm.setTextColor(
+                    if (bpm > 0) Color.parseColor("#FF1744") else Color.parseColor("#9E9E9E")
+                )
+            }
+        }
     }
 
     private fun connectWebSocket() {

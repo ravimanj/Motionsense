@@ -1,5 +1,6 @@
 package com.motionsense.ai
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -59,6 +60,76 @@ class SetupActivity : AppCompatActivity() {
             startActivity(intent)
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
         }
+
+        setupBle()
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions.all { it.value }) {
+            showScanDialog()
+        }
+    }
+
+    private fun setupBle() {
+        val bleManager = com.motionsense.ai.network.BleHeartRateManager.getInstance(this)
+        
+        // Auto-reconnect on startup
+        bleManager.autoReconnect()
+        
+        // Observe status
+        androidx.lifecycle.lifecycleScope.kotlinx.coroutines.launch {
+            bleManager.connectionState.collect { state ->
+                binding.tvBleStatus.text = state
+            }
+        }
+
+        binding.btnConnectBle.setOnClickListener {
+            val permissions = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                arrayOf(
+                    android.Manifest.permission.BLUETOOTH_SCAN,
+                    android.Manifest.permission.BLUETOOTH_CONNECT,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            } else {
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+            
+            if (permissions.all { checkSelfPermission(it) == android.content.pm.PackageManager.PERMISSION_GRANTED }) {
+                showScanDialog()
+            } else {
+                requestPermissionLauncher.launch(permissions)
+            }
+        }
+    }
+
+    private fun showScanDialog() {
+        val bleManager = com.motionsense.ai.network.BleHeartRateManager.getInstance(this)
+        val adapter = android.widget.ArrayAdapter<String>(this, android.R.layout.simple_list_item_1)
+        val deviceMap = mutableMapOf<String, android.bluetooth.BluetoothDevice>()
+
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Scanning for HR Monitors...")
+            .setAdapter(adapter) { _, which ->
+                val mac = adapter.getItem(which)?.substringAfterLast(" ")
+                deviceMap[mac]?.let { bleManager.connectToDevice(it) }
+            }
+            .setNegativeButton("Cancel") { _, _ -> bleManager.stopScan() }
+            .show()
+
+        bleManager.onDeviceDiscovered = { device, _ ->
+            val mac = device.address
+            if (!deviceMap.containsKey(mac)) {
+                deviceMap[mac] = device
+                @SuppressLint("MissingPermission")
+                val name = device.name ?: "Unknown Monitor"
+                adapter.add("$name - $mac")
+                adapter.notifyDataSetDataSetChanged()
+            }
+        }
+        
+        bleManager.startScan()
     }
 
     private fun buildChips(
