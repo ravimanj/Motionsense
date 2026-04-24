@@ -129,14 +129,21 @@ class VideoTrackerActivity : AppCompatActivity() {
                     try {
                         val bitmap = binding.textureView.bitmap
                         if (bitmap != null) {
-                            // Scale down if needed to save bandwidth
+                            // Scale down to max 480px width to save bandwidth and prevent lag
+                            val maxWidth = 480
+                            val scale = maxWidth.toFloat() / bitmap.width
+                            val scaledHeight = (bitmap.height * scale).toInt()
+                            
+                            val scaledBitmap = Bitmap.createScaledBitmap(bitmap, maxWidth, scaledHeight, true)
+                            
                             val out = ByteArrayOutputStream()
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, Constants.JPEG_QUALITY, out)
+                            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, Constants.JPEG_QUALITY, out)
                             val b64 = Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP)
                             
                             // Send to WebSocket
                             wsManager?.send("""{"frame":"$b64"}""")
                             bitmap.recycle()
+                            scaledBitmap.recycle()
                         }
                     } catch (e: Exception) {
                         Log.e(TAG, "Frame extraction error", e)
