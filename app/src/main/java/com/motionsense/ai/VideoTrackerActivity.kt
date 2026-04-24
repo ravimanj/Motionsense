@@ -78,6 +78,8 @@ class VideoTrackerActivity : AppCompatActivity() {
         setupVideoPlayer()
     }
 
+    private var isUserPaused = false
+
     private fun setupUI() {
         binding.tvExerciseName.text   = exerciseName
         binding.tvTargetLabel.text    = "/ $targetReps REPS"
@@ -89,6 +91,19 @@ class VideoTrackerActivity : AppCompatActivity() {
 
         binding.btnStop.setOnClickListener {
             stopSession()
+        }
+
+        binding.btnPlayPause.setOnClickListener {
+            if (mediaPlayer?.isPlaying == true) {
+                mediaPlayer?.pause()
+                isUserPaused = true
+                binding.btnPlayPause.text = "▶ Play"
+            } else {
+                mediaPlayer?.start()
+                isUserPaused = false
+                binding.btnPlayPause.text = "⏸ Pause"
+                if (frameJob?.isActive != true) startFrameExtraction()
+            }
         }
 
         // Disable mirroring for pre-recorded videos
@@ -104,8 +119,10 @@ class VideoTrackerActivity : AppCompatActivity() {
                         setDataSource(this@VideoTrackerActivity, videoUri!!)
                         setSurface(surface)
                         setOnPreparedListener {
-                            it.start()
-                            startFrameExtraction()
+                            // Don't auto-start immediately; wait for WebSocket
+                            // But seek to frame 1 so it's not a black screen
+                            it.seekTo(1)
+                            binding.btnPlayPause.text = "▶ Play"
                         }
                         setOnCompletionListener {
                             stopSession()
@@ -168,6 +185,12 @@ class VideoTrackerActivity : AppCompatActivity() {
                         binding.tvConnectionStatus.setTextColor(Color.parseColor("#00E676"))
                         binding.tvFeedback.text = "Analyzing video... \uD83E\uDD16"
                         binding.tvFeedback.setBackgroundColor(Color.parseColor("#1B5E20"))
+                        
+                        if (!isUserPaused && mediaPlayer?.isPlaying == false) {
+                            mediaPlayer?.start()
+                            binding.btnPlayPause.text = "⏸ Pause"
+                            startFrameExtraction()
+                        }
                     }
                 }
 

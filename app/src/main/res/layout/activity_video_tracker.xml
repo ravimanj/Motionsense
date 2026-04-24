@@ -61,6 +61,23 @@
             android:textColor="@color/status_warning"
             android:layout_marginEnd="12dp" />
 
+        <!-- Play/Pause Button -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnPlayPause"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="⏸ Pause"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/bg_pill_green"
+            android:stateListAnimator="@null"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginEnd="8dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp" />
+
         <!-- Stop Button -->
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnStop"
