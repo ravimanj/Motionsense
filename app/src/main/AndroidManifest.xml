@@ -54,6 +54,9 @@
             android:name=".LiveTrackerActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".VideoTrackerActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".SessionSummaryActivity"
             android:screenOrientation="portrait" />
     </application>

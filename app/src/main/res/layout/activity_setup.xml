@@ -258,11 +258,26 @@
             android:layout_height="56dp"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:text="Start Session 💪"
+            android:text="Start Live Session 💪"
             android:textSize="17sp"
             android:textStyle="bold"
             android:textColor="@color/bg_primary"
             android:background="@drawable/bg_button_primary"
+            android:stateListAnimator="@null" />
+
+        <!-- Upload Video Button -->
+        <Button
+            android:id="@+id/btnUploadVideo"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="12dp"
+            android:text="Upload Video for Analysis 📁"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@color/accent_purple"
+            android:background="@drawable/bg_card"
             android:stateListAnimator="@null" />
 
     </LinearLayout>

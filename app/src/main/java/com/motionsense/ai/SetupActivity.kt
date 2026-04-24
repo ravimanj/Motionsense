@@ -63,7 +63,28 @@ class SetupActivity : AppCompatActivity() {
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
         }
 
+        binding.btnUploadVideo.setOnClickListener {
+            videoPickerLauncher.launch("video/*")
+        }
+
         setupBle()
+    }
+
+    private val videoPickerLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            val intent = Intent(this, VideoTrackerActivity::class.java).apply {
+                putExtra(Constants.EXTRA_EXERCISE_KEY,  exerciseKey)
+                putExtra(Constants.EXTRA_EXERCISE_NAME, exerciseName)
+                putExtra(Constants.EXTRA_MUSCLES,       muscles)
+                putExtra(Constants.EXTRA_TARGET_REPS,   selectedReps)
+                putExtra(Constants.EXTRA_WEIGHT,        selectedWeight.toDouble())
+                putExtra("EXTRA_VIDEO_URI", uri.toString())
+            }
+            startActivity(intent)
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+        }
     }
 
     private val requestPermissionLauncher = registerForActivityResult(
