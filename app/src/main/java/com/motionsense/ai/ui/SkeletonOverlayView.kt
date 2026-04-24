@@ -46,12 +46,29 @@ class SkeletonOverlayView @JvmOverloads constructor(
     // Key joint indices to highlight
     private val KEY_JOINTS = setOf(11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28)
 
+    private var smoothedLandmarks: List<Landmark>? = null
+    private val alpha = 0.4f // Smoothing factor: lower = smoother but more lag
+
     fun updateLandmarks(newLandmarks: List<Landmark>) {
-        landmarks = newLandmarks
+        if (smoothedLandmarks == null || smoothedLandmarks!!.size != newLandmarks.size) {
+            smoothedLandmarks = newLandmarks
+        } else {
+            smoothedLandmarks = newLandmarks.mapIndexed { index, target ->
+                val current = smoothedLandmarks!![index]
+                Landmark(
+                    x = alpha * target.x + (1 - alpha) * current.x,
+                    y = alpha * target.y + (1 - alpha) * current.y,
+                    z = alpha * target.z + (1 - alpha) * current.z,
+                    visibility = target.visibility
+                )
+            }
+        }
+        landmarks = smoothedLandmarks!!
         invalidate()
     }
 
     fun clearLandmarks() {
+        smoothedLandmarks = null
         landmarks = emptyList()
         invalidate()
     }

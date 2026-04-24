@@ -46,8 +46,18 @@ class ShoulderPressTracker:
         r_wrist    = [lm[PL.RIGHT_WRIST].x,    lm[PL.RIGHT_WRIST].y]
         r_hip      = [lm[PL.RIGHT_HIP].x,      lm[PL.RIGHT_HIP].y]
 
-        elbow_angle = calculate_angle(r_shoulder, r_elbow, r_wrist)
-        lean_dx     = abs(r_hip[0] - r_shoulder[0])
+        raw_elbow_angle = calculate_angle(r_shoulder, r_elbow, r_wrist)
+        raw_lean_dx     = abs(r_hip[0] - r_shoulder[0])
+
+        if not hasattr(self, 'smoothed_elbow'):
+            self.smoothed_elbow = raw_elbow_angle
+            self.smoothed_lean = raw_lean_dx
+        else:
+            self.smoothed_elbow = 0.4 * raw_elbow_angle + 0.6 * self.smoothed_elbow
+            self.smoothed_lean = 0.4 * raw_lean_dx + 0.6 * self.smoothed_lean
+            
+        elbow_angle = self.smoothed_elbow
+        lean_dx = self.smoothed_lean
 
         # ── Form checks ───────────────────────────────────────────────────────
         frame_errors: set[str] = set()

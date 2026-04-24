@@ -51,7 +51,13 @@ class BicepCurlTracker:
         elbow    = [lm[PL.LEFT_ELBOW].x,    lm[PL.LEFT_ELBOW].y]
         wrist    = [lm[PL.LEFT_WRIST].x,    lm[PL.LEFT_WRIST].y]
 
-        angle       = calculate_angle(shoulder, elbow, wrist)
+        raw_angle = calculate_angle(shoulder, elbow, wrist)
+        if not hasattr(self, 'smoothed_angle'):
+            self.smoothed_angle = raw_angle
+        else:
+            self.smoothed_angle = 0.4 * raw_angle + 0.6 * self.smoothed_angle
+            
+        angle = self.smoothed_angle
         elbow_shift = abs(elbow[0] - shoulder[0])
 
         # ── Form checks ───────────────────────────────────────────────────────

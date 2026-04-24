@@ -49,8 +49,18 @@ class PushUpTracker:
         r_hip      = [lm[PL.RIGHT_HIP].x,      lm[PL.RIGHT_HIP].y]
         r_knee     = [lm[PL.RIGHT_KNEE].x,     lm[PL.RIGHT_KNEE].y]
 
-        elbow_angle = calculate_angle(r_shoulder, r_elbow, r_wrist)
-        hip_angle   = calculate_angle(r_shoulder, r_hip,   r_knee)
+        raw_elbow_angle = calculate_angle(r_shoulder, r_elbow, r_wrist)
+        raw_hip_angle   = calculate_angle(r_shoulder, r_hip,   r_knee)
+
+        if not hasattr(self, 'smoothed_elbow'):
+            self.smoothed_elbow = raw_elbow_angle
+            self.smoothed_hip = raw_hip_angle
+        else:
+            self.smoothed_elbow = 0.4 * raw_elbow_angle + 0.6 * self.smoothed_elbow
+            self.smoothed_hip = 0.4 * raw_hip_angle + 0.6 * self.smoothed_hip
+            
+        elbow_angle = self.smoothed_elbow
+        hip_angle = self.smoothed_hip
 
         # ── Form checks ───────────────────────────────────────────────────────
         frame_errors: set[str] = set()

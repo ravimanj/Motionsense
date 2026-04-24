@@ -49,8 +49,18 @@ class SquatTracker:
         r_ankle    = [lm[PL.RIGHT_ANKLE].x,     lm[PL.RIGHT_ANKLE].y]
         r_shoulder = [lm[PL.RIGHT_SHOULDER].x,  lm[PL.RIGHT_SHOULDER].y]
 
-        knee_angle = calculate_angle(r_hip, r_knee, r_ankle)
-        hip_angle  = calculate_angle(r_shoulder, r_hip, r_knee)
+        raw_knee_angle = calculate_angle(r_hip, r_knee, r_ankle)
+        raw_hip_angle  = calculate_angle(r_shoulder, r_hip, r_knee)
+
+        if not hasattr(self, 'smoothed_knee'):
+            self.smoothed_knee = raw_knee_angle
+            self.smoothed_hip = raw_hip_angle
+        else:
+            self.smoothed_knee = 0.4 * raw_knee_angle + 0.6 * self.smoothed_knee
+            self.smoothed_hip = 0.4 * raw_hip_angle + 0.6 * self.smoothed_hip
+            
+        knee_angle = self.smoothed_knee
+        hip_angle = self.smoothed_hip
 
         # ── Form checks ───────────────────────────────────────────────────────
         frame_errors: set[str] = set()
