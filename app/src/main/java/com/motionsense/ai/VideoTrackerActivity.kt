@@ -91,7 +91,8 @@ class VideoTrackerActivity : AppCompatActivity() {
             stopSession()
         }
 
-        // We do not observe BLE Heart Rate here since it's a pre-recorded video
+        // Disable mirroring for pre-recorded videos
+        binding.skeletonOverlay.isMirrored = false
     }
 
     private fun setupVideoPlayer() {

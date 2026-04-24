@@ -48,6 +48,8 @@ class SkeletonOverlayView @JvmOverloads constructor(
 
     private var smoothedLandmarks: List<Landmark>? = null
     private val alpha = 0.4f // Smoothing factor: lower = smoother but more lag
+    
+    var isMirrored = true // Default true for front-camera live tracker
 
     fun updateLandmarks(newLandmarks: List<Landmark>) {
         if (smoothedLandmarks == null || smoothedLandmarks!!.size != newLandmarks.size) {
@@ -86,12 +88,9 @@ class SkeletonOverlayView @JvmOverloads constructor(
                 val s = landmarks[startIdx]
                 val e = landmarks[endIdx]
                 if (s.visibility > 0.4f && e.visibility > 0.4f) {
-                    // Mirror x for front camera
-                    canvas.drawLine(
-                        (1f - s.x) * w, s.y * h,
-                        (1f - e.x) * w, e.y * h,
-                        linePaint
-                    )
+                    val sx = if (isMirrored) (1f - s.x) * w else s.x * w
+                    val ex = if (isMirrored) (1f - e.x) * w else e.x * w
+                    canvas.drawLine(sx, s.y * h, ex, e.y * h, linePaint)
                 }
             }
         }
@@ -99,7 +98,7 @@ class SkeletonOverlayView @JvmOverloads constructor(
         // Draw landmark dots
         for ((idx, lm) in landmarks.withIndex()) {
             if (lm.visibility > 0.4f) {
-                val px = (1f - lm.x) * w
+                val px = if (isMirrored) (1f - lm.x) * w else lm.x * w
                 val py = lm.y * h
                 val paint = if (idx in KEY_JOINTS) accentDotPaint else dotPaint
                 val radius = if (idx in KEY_JOINTS) 9f else 6f
