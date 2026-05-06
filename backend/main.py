@@ -9,11 +9,13 @@ Frame protocol
                      or plain base64 string (fallback)
   Server  → Android: JSON matching FrameResult data class (see below)
 """
+import asyncio
 import base64
 import json
 import logging
 import numpy as np
 import cv2
+from concurrent.futures import ThreadPoolExecutor
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -34,10 +36,15 @@ models.Base.metadata.create_all(bind=engine)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("motionsense")
 
+# ── Thread pool for blocking MediaPipe inference ───────────────────────────────
+# max_workers=2: allows two concurrent sessions without spawning unbounded threads.
+# MediaPipe is CPU-bound, so more than 2 workers on a free-tier server would thrash.
+_executor = ThreadPoolExecutor(max_workers=2)
+
 # ── App ───────────────────────────────────────────────────────────────────────
 app = FastAPI(
     title="MotionSense AI API",
-    version="2.0.0",
+    version="2.1.0",
     description="Real-time pose estimation & rep counting via WebSocket",
 )
 
@@ -63,7 +70,7 @@ EXERCISE_MAP = {
 # ── HTTP endpoints ────────────────────────────────────────────────────────────
 @app.get("/")
 async def health():
-    return {"status": "ok", "service": "MotionSense AI API", "version": "2.0.0"}
+    return {"status": "ok", "service": "MotionSense AI API", "version": "2.1.0"}
 
 
 @app.get("/exercises")
@@ -120,6 +127,7 @@ async def websocket_endpoint(
         return
 
     tracker = tracker_class(reps_target=reps, weight=weight)
+    loop = asyncio.get_event_loop()
 
     try:
         while True:
@@ -143,8 +151,14 @@ async def websocket_endpoint(
                 })
                 continue
 
-            # ── Run exercise tracker ──────────────────────────────────────────
-            result = tracker.process_frame(frame)
+            # ── Run exercise tracker in thread pool (non-blocking) ────────────
+            # MediaPipe inference takes 80–200 ms on CPU. Running it directly
+            # in an async function blocks the entire event loop. Using
+            # run_in_executor offloads it to a background thread, keeping the
+            # loop free to handle new frames / connections / HTTP requests.
+            result = await loop.run_in_executor(
+                _executor, tracker.process_frame, frame
+            )
             await websocket.send_json(result)
 
             # Close gracefully when target is reached
