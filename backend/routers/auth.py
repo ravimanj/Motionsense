@@ -5,6 +5,7 @@ import random
 
 from database import get_db
 import models, schemas, security
+from email_service import send_otp_email
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -24,13 +25,19 @@ def send_otp(request: schemas.EmailRequest, db: Session = Depends(get_db)):
     )
     db.add(otp_request)
     db.commit()
-    
-    # In a real app, send email here. For now, log it.
-    print(f"\n=======================================")
-    print(f"OTP for {request.email}: {otp_code}")
-    print(f"=======================================\n")
-    
-    return {"message": "OTP sent successfully"}
+
+    # Send OTP via email (falls back to console log if credentials not set)
+    sent = send_otp_email(to_email=request.email, otp_code=otp_code)
+    if not sent:
+        # Roll back the DB record so the user can retry
+        db.query(models.OTPRequest).filter(models.OTPRequest.email == request.email).delete()
+        db.commit()
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Failed to send OTP email. Please try again."
+        )
+
+    return {"message": "OTP sent to your email address"}
 
 @router.post("/verify-otp", status_code=status.HTTP_200_OK)
 def verify_otp(request: schemas.VerifyOTPRequest, db: Session = Depends(get_db)):

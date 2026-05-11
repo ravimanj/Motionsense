@@ -16,6 +16,11 @@ import logging
 import numpy as np
 import cv2
 from concurrent.futures import ThreadPoolExecutor
+from dotenv import load_dotenv
+
+# Load .env file for local development (no-op if running on Render with env vars set)
+load_dotenv()
+
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
