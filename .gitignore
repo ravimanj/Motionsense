@@ -13,7 +13,3 @@
 .externalNativeBuild
 .cxx
 local.properties
-
-# Environment / secrets — never commit these
-backend/.env
-*.env
