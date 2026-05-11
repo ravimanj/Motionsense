@@ -1,57 +1,47 @@
 """
-email_service.py — Send OTP emails via SendGrid HTTP API
-=========================================================
-WHY NOT SMTP?
-  Render's free tier blocks outbound TCP on port 587 (SMTP).
-  SendGrid's HTTP API uses port 443 (HTTPS) which works on all tiers.
-
+email_service.py — Send OTP emails via Gmail SMTP (TLS)
+========================================================
 Required environment variables (set in .env or Render dashboard):
-  SENDGRID_API_KEY  — your SendGrid API key (starts with "SG.")
-  SENDGRID_FROM     — the verified sender email address
+  GMAIL_USER     — your Gmail address, e.g. yourapp@gmail.com
+  GMAIL_APP_PASS — 16-char Gmail App Password (NOT your real password)
 
-Quick setup (5 minutes, free):
-  1. Sign up at https://signup.sendgrid.com  (free — 100 emails/day)
-  2. Go to Settings → Sender Authentication → Single Sender Verification
-  3. Add & verify your email address (click the link SendGrid sends you)
-  4. Go to Settings → API Keys → Create API Key
-     - Permission: "Restricted" → enable "Mail Send" only
-     - Copy the key (starts with "SG.")
-  5. Set env vars on Render dashboard:
-       SENDGRID_API_KEY = SG.xxxxxxxxxxxx
-       SENDGRID_FROM    = yourverified@gmail.com
+How to generate a Gmail App Password:
+  1. Enable 2-Step Verification on your Google account
+  2. Go to: https://myaccount.google.com/apppasswords
+  3. Create an app password for "Mail" → copy the 16-char code
+  4. Paste it as GMAIL_APP_PASS in your .env file
 """
 import os
+import smtplib
 import logging
-import urllib.request
-import urllib.error
-import json
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 logger = logging.getLogger("motionsense.email")
 
 # ── Load from environment ──────────────────────────────────────────────────────
-SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY", "")
-SENDGRID_FROM    = os.getenv("SENDGRID_FROM", "")
-
-# SendGrid Mail Send endpoint (HTTPS — works on Render free tier)
-_SENDGRID_URL = "https://api.sendgrid.com/v3/mail/send"
+GMAIL_USER     = os.getenv("GMAIL_USER", "")
+GMAIL_APP_PASS = os.getenv("GMAIL_APP_PASS", "")
 
 
 def send_otp_email(to_email: str, otp_code: str) -> bool:
     """
-    Send a 6-digit OTP to *to_email* via SendGrid's HTTP API (HTTPS / port 443).
+    Send a 6-digit OTP to *to_email* via Gmail SMTP over TLS (port 587).
 
-    Returns True on success, False on any failure.
+    Returns True on success, False on any SMTP/network failure.
     Falls back to console logging when credentials are not configured so that
-    local development still works without an API key.
+    local development still works without email setup.
     """
-    if not SENDGRID_API_KEY or not SENDGRID_FROM:
-        # Dev fallback — print to console so local dev still works
-        logger.warning("SendGrid credentials not set. Falling back to console OTP.")
-        print(f"\n{'='*50}")
-        print(f"  [DEV] OTP for {to_email}: {otp_code}")
-        print(f"{'='*50}\n")
+    if not GMAIL_USER or not GMAIL_APP_PASS:
+        # Dev fallback — print to console instead of crashing
+        logger.warning("Email credentials not set. Falling back to console OTP.")
+        print(f"\n{'='*45}")
+        print(f"  OTP for {to_email}: {otp_code}")
+        print(f"{'='*45}\n")
         return True  # treat as "sent" so the API still responds OK
 
+    # ── Build the HTML email ───────────────────────────────────────────────────
+    subject = "Your MotionSense Verification Code"
     html_body = f"""
     <html>
       <body style="font-family: Arial, sans-serif; background: #0d0d0d; color: #f0f0f0; padding: 32px;">
@@ -89,41 +79,27 @@ def send_otp_email(to_email: str, otp_code: str) -> bool:
     </html>
     """
 
-    # ── Build SendGrid v3 JSON payload ────────────────────────────────────────
-    payload = {
-        "personalizations": [{"to": [{"email": to_email}]}],
-        "from": {"email": SENDGRID_FROM, "name": "MotionSense AI"},
-        "subject": "Your MotionSense Verification Code",
-        "content": [{"type": "text/html", "value": html_body}],
-    }
+    # ── Compose MIME message ───────────────────────────────────────────────────
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"]    = f"MotionSense AI <{GMAIL_USER}>"
+    msg["To"]      = to_email
+    msg.attach(MIMEText(html_body, "html"))
 
-    # ── Send via HTTPS (no SMTP, works on Render free tier) ───────────────────
+    # ── Send via Gmail SMTP (TLS, port 587) ────────────────────────────────────
     try:
-        data = json.dumps(payload).encode("utf-8")
-        req = urllib.request.Request(
-            _SENDGRID_URL,
-            data=data,
-            headers={
-                "Authorization": f"Bearer {SENDGRID_API_KEY}",
-                "Content-Type":  "application/json",
-            },
-            method="POST",
-        )
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            status = resp.status
-            # SendGrid returns 202 Accepted on success
-            if status == 202:
-                logger.info(f"OTP email sent to {to_email} (HTTP {status})")
-                return True
-            else:
-                logger.error(f"SendGrid unexpected status {status} for {to_email}")
-                return False
-
-    except urllib.error.HTTPError as exc:
-        body = exc.read().decode("utf-8", errors="replace")
+        with smtplib.SMTP("smtp.gmail.com", 587, timeout=15) as server:
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(GMAIL_USER, GMAIL_APP_PASS)
+            server.sendmail(GMAIL_USER, to_email, msg.as_string())
+        logger.info(f"OTP email sent to {to_email}")
+        return True
+    except smtplib.SMTPAuthenticationError:
         logger.error(
-            f"SendGrid HTTP error {exc.code} for {to_email}: {body}\n"
-            "Check that SENDGRID_FROM is a verified sender in your SendGrid account."
+            "Gmail SMTP auth failed — check GMAIL_USER and GMAIL_APP_PASS. "
+            "Make sure you are using a 16-char App Password, not your real password."
         )
         return False
     except Exception as exc:
