@@ -8,13 +8,13 @@ mp_pose = mp.solutions.pose
 PL = mp_pose.PoseLandmark
 
 # ── Angle thresholds ──────────────────────────────────────────────────────────
-# Widened vs original (160/40) to be more forgiving of oblique camera angles
-DOWN_THRESHOLD = 155   # arm straight / extended  (rep "down" position)
-UP_THRESHOLD   = 50    # arm fully curled          (rep "up"   position)
-TOLERANCE      = 12    # angle tolerance for phase transitions
+# Relaxed vs previous values to be more forgiving of camera angles / partial extension
+DOWN_THRESHOLD = 145   # arm extended (rep "down") — was 155, many people stop at ~145
+UP_THRESHOLD   = 55    # arm curled (rep "up") — was 50, slightly more forgiving
+TOLERANCE      = 15    # wider tolerance for noisy video frames — was 12
 
-SWING_THRESHOLD    = 0.08  # max horizontal elbow drift (normalized coords)
-BAD_FORM_THRESHOLD = 6     # consecutive bad frames before flagging (at ~7 FPS → ~0.9 s)
+SWING_THRESHOLD    = 0.12  # max horizontal elbow drift — relaxed from 0.08
+BAD_FORM_THRESHOLD = 5     # consecutive bad frames before flagging
 
 
 class BicepCurlTracker:
@@ -53,19 +53,22 @@ class BicepCurlTracker:
         angles = []
         elbow_shifts = []
 
-        if left_vis >= 0.4:
+        if left_vis >= 0.3:
             l_shoulder = [lm[PL.LEFT_SHOULDER].x,  lm[PL.LEFT_SHOULDER].y]
             l_elbow    = [lm[PL.LEFT_ELBOW].x,     lm[PL.LEFT_ELBOW].y]
             l_wrist    = [lm[PL.LEFT_WRIST].x,     lm[PL.LEFT_WRIST].y]
             angles.append(calculate_angle(l_shoulder, l_elbow, l_wrist))
             elbow_shifts.append(abs(l_elbow[0] - l_shoulder[0]))
 
-        if right_vis >= 0.4:
+        if right_vis >= 0.3:
             r_shoulder = [lm[PL.RIGHT_SHOULDER].x, lm[PL.RIGHT_SHOULDER].y]
             r_elbow    = [lm[PL.RIGHT_ELBOW].x,    lm[PL.RIGHT_ELBOW].y]
             r_wrist    = [lm[PL.RIGHT_WRIST].x,    lm[PL.RIGHT_WRIST].y]
             angles.append(calculate_angle(r_shoulder, r_elbow, r_wrist))
             elbow_shifts.append(abs(r_elbow[0] - r_shoulder[0]))
+
+        left_vis_avg  = (lm[PL.LEFT_SHOULDER].visibility + lm[PL.LEFT_ELBOW].visibility + lm[PL.LEFT_WRIST].visibility) / 3
+        right_vis_avg = (lm[PL.RIGHT_SHOULDER].visibility + lm[PL.RIGHT_ELBOW].visibility + lm[PL.RIGHT_WRIST].visibility) / 3
 
         if not angles:
             return self._base_result(detected=False,

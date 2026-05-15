@@ -8,9 +8,9 @@ mp_pose = mp.solutions.pose
 PL = mp_pose.PoseLandmark
 
 UP_THRESHOLD   = 165   # knee straight (standing)
-DOWN_THRESHOLD = 90    # knee bent (squat depth) — widened from 80
+DOWN_THRESHOLD = 100   # knee bent (squat depth) — was 90, relaxed for real-world angles
 
-FORWARD_LEAN_THRESHOLD = 85   # relaxed from 95
+FORWARD_LEAN_THRESHOLD = 80   # relaxed from 85 to reduce false positives
 
 
 class SquatTracker:
@@ -41,7 +41,7 @@ class SquatTracker:
 
         knee_angles, hip_angles = [], []
 
-        if left_vis >= 0.4:
+        if left_vis >= 0.3:
             knee_angles.append(calculate_angle(
                 [lm[PL.LEFT_HIP].x, lm[PL.LEFT_HIP].y],
                 [lm[PL.LEFT_KNEE].x, lm[PL.LEFT_KNEE].y],
@@ -51,7 +51,7 @@ class SquatTracker:
                 [lm[PL.LEFT_HIP].x, lm[PL.LEFT_HIP].y],
                 [lm[PL.LEFT_KNEE].x, lm[PL.LEFT_KNEE].y]))
 
-        if right_vis >= 0.4:
+        if right_vis >= 0.3:
             knee_angles.append(calculate_angle(
                 [lm[PL.RIGHT_HIP].x, lm[PL.RIGHT_HIP].y],
                 [lm[PL.RIGHT_KNEE].x, lm[PL.RIGHT_KNEE].y],

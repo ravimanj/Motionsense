@@ -163,7 +163,13 @@ class VideoTrackerActivity : AppCompatActivity() {
 
     private fun startFrameExtraction() {
         frameJob = lifecycleScope.launch(Dispatchers.IO) {
-            while (isActive && mediaPlayer?.isPlaying == true) {
+            while (isActive) {
+                // Only process when video is actually playing
+                if (mediaPlayer?.isPlaying != true) {
+                    delay(Constants.FRAME_INTERVAL_MS)
+                    continue
+                }
+
                 if (wsManager?.connected() == true) {
                     if (frameInFlight.get()) {
                         // Server hasn't replied yet — pause video so it doesn't
@@ -171,11 +177,11 @@ class VideoTrackerActivity : AppCompatActivity() {
                         runOnUiThread {
                             if (mediaPlayer?.isPlaying == true) {
                                 mediaPlayer?.pause()
-                                binding.btnPlayPause.text = "⏸ Pause"
+                                binding.btnPlayPause.text = "▶ Play"
                             }
                         }
                     } else {
-                        // Resume video if it was paused by back-pressure
+                        // Resume video if it was paused by back-pressure (not by user)
                         runOnUiThread {
                             if (!isUserPaused && mediaPlayer?.isPlaying == false) {
                                 mediaPlayer?.start()
@@ -185,8 +191,6 @@ class VideoTrackerActivity : AppCompatActivity() {
                         try {
                             val bitmap = binding.textureView.bitmap
                             if (bitmap != null) {
-                                // 480px width: good landmark accuracy while keeping
-                                // payload small enough to send within 150ms.
                                 val maxWidth = Constants.FRAME_MAX_WIDTH
                                 val scale = maxWidth.toFloat() / bitmap.width
                                 val scaledHeight = (bitmap.height * scale).toInt()

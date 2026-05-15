@@ -39,20 +39,20 @@ class ShoulderPressTracker:
 
         elbow_angles, lean_dxs = [], []
 
-        if left_vis >= 0.4:
+        if left_vis >= 0.3:
             elbow_angles.append(calculate_angle(
                 [lm[PL.LEFT_SHOULDER].x, lm[PL.LEFT_SHOULDER].y],
                 [lm[PL.LEFT_ELBOW].x,    lm[PL.LEFT_ELBOW].y],
                 [lm[PL.LEFT_WRIST].x,    lm[PL.LEFT_WRIST].y]))
-            if lm[PL.LEFT_HIP].visibility >= 0.4:
+            if lm[PL.LEFT_HIP].visibility >= 0.3:
                 lean_dxs.append(abs(lm[PL.LEFT_HIP].x - lm[PL.LEFT_SHOULDER].x))
 
-        if right_vis >= 0.4:
+        if right_vis >= 0.3:
             elbow_angles.append(calculate_angle(
                 [lm[PL.RIGHT_SHOULDER].x, lm[PL.RIGHT_SHOULDER].y],
                 [lm[PL.RIGHT_ELBOW].x,    lm[PL.RIGHT_ELBOW].y],
                 [lm[PL.RIGHT_WRIST].x,    lm[PL.RIGHT_WRIST].y]))
-            if lm[PL.RIGHT_HIP].visibility >= 0.4:
+            if lm[PL.RIGHT_HIP].visibility >= 0.3:
                 lean_dxs.append(abs(lm[PL.RIGHT_HIP].x - lm[PL.RIGHT_SHOULDER].x))
 
         if not elbow_angles:

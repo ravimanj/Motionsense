@@ -7,9 +7,9 @@ import mediapipe as mp
 mp_pose = mp.solutions.pose
 PL = mp_pose.PoseLandmark
 
-DOWN_THRESHOLD      = 160   # elbow angle at top (arms straight)
-UP_THRESHOLD        = 90    # elbow angle at bottom (arms bent)
-HIP_ANGLE_THRESHOLD = 150   # relaxed from 160 — less false hip-sag for oblique cameras
+DOWN_THRESHOLD      = 150   # elbow angle at top (arms straight) — was 160, relaxed
+UP_THRESHOLD        = 95    # elbow angle at bottom (arms bent) — was 90, more forgiving
+HIP_ANGLE_THRESHOLD = 140   # relaxed from 150 — reduces false hip-sag flags on video
 TOLERANCE           = 10
 
 
@@ -41,23 +41,23 @@ class PushUpTracker:
 
         elbow_angles, hip_angles = [], []
 
-        if left_vis >= 0.4:
+        if left_vis >= 0.3:
             elbow_angles.append(calculate_angle(
                 [lm[PL.LEFT_SHOULDER].x, lm[PL.LEFT_SHOULDER].y],
                 [lm[PL.LEFT_ELBOW].x,    lm[PL.LEFT_ELBOW].y],
                 [lm[PL.LEFT_WRIST].x,    lm[PL.LEFT_WRIST].y]))
-            if lm[PL.LEFT_HIP].visibility >= 0.4 and lm[PL.LEFT_KNEE].visibility >= 0.4:
+            if lm[PL.LEFT_HIP].visibility >= 0.3 and lm[PL.LEFT_KNEE].visibility >= 0.3:
                 hip_angles.append(calculate_angle(
                     [lm[PL.LEFT_SHOULDER].x, lm[PL.LEFT_SHOULDER].y],
                     [lm[PL.LEFT_HIP].x,      lm[PL.LEFT_HIP].y],
                     [lm[PL.LEFT_KNEE].x,     lm[PL.LEFT_KNEE].y]))
 
-        if right_vis >= 0.4:
+        if right_vis >= 0.3:
             elbow_angles.append(calculate_angle(
                 [lm[PL.RIGHT_SHOULDER].x, lm[PL.RIGHT_SHOULDER].y],
                 [lm[PL.RIGHT_ELBOW].x,    lm[PL.RIGHT_ELBOW].y],
                 [lm[PL.RIGHT_WRIST].x,    lm[PL.RIGHT_WRIST].y]))
-            if lm[PL.RIGHT_HIP].visibility >= 0.4 and lm[PL.RIGHT_KNEE].visibility >= 0.4:
+            if lm[PL.RIGHT_HIP].visibility >= 0.3 and lm[PL.RIGHT_KNEE].visibility >= 0.3:
                 hip_angles.append(calculate_angle(
                     [lm[PL.RIGHT_SHOULDER].x, lm[PL.RIGHT_SHOULDER].y],
                     [lm[PL.RIGHT_HIP].x,      lm[PL.RIGHT_HIP].y],
