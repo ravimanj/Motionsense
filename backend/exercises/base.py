@@ -25,7 +25,7 @@ def make_pose() -> mp_pose.Pose:
         model_complexity=1,
         smooth_landmarks=True,
         min_detection_confidence=0.5,
-        min_tracking_confidence=0.5,
+        min_tracking_confidence=0.65,  # raised from 0.5 — reduces jitter between video frames
     )
 
 

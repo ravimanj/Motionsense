@@ -20,7 +20,8 @@ class PushUpTracker:
         self.counter        = 0
         self.correct_reps   = 0
         self.incorrect_reps = 0
-        self.form_errors    = set()
+        self.form_errors    = set()   # session-wide accumulator (for summary)
+        self._rep_errors    = set()   # errors in the current rep only
         self.stage          = "down"   # "down" = arms straight (top), "up" = arms bent (bottom)
         self._pose = make_pose()
 
@@ -87,7 +88,8 @@ class PushUpTracker:
             feedback      = "INCOMPLETE DEPTH: Lower your chest further!"
             feedback_type = "warning"
 
-        self.form_errors.update(frame_errors)
+        self.form_errors.update(frame_errors)  # session accumulator
+        self._rep_errors.update(frame_errors)   # per-rep accumulator
 
         rep_completed = False
 
@@ -96,7 +98,7 @@ class PushUpTracker:
             self.stage = "up"
             self.counter += 1
             rep_completed = True
-            if frame_errors - {"incomplete extension"}:
+            if self._rep_errors - {"incomplete extension"}:
                 self.incorrect_reps += 1
                 feedback      = "Rep counted — check your form!"
                 feedback_type = "error"
@@ -104,6 +106,7 @@ class PushUpTracker:
                 self.correct_reps += 1
                 feedback      = "✅ Great push-up!"
                 feedback_type = "success"
+            self._rep_errors.clear()  # reset for next rep
 
         # Transition back to top (arms straight)
         elif elbow_angle > DOWN_THRESHOLD and self.stage == "up":

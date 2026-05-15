@@ -25,6 +25,11 @@ object Constants {
     const val EXTRA_FORM_ERRORS     = "form_errors"
 
     // ─── Frame streaming ─────────────────────────────────────────────────────────
-    const val FRAME_INTERVAL_MS = 100L
-    const val JPEG_QUALITY      = 65
+    // 150 ms ≈ 6-7 FPS — MediaPipe on Render free tier takes ~100-180ms per frame.
+    // Sending faster than that just creates a queue backlog and perceived lag.
+    const val FRAME_INTERVAL_MS = 150L
+    // 480px: better landmark accuracy for MediaPipe vs 320px, still compact enough
+    // to encode/send within the 150ms budget on a typical 4G connection.
+    const val FRAME_MAX_WIDTH   = 480
+    const val JPEG_QUALITY      = 85  // 85 vs 75: sharper edges → more stable landmarks
 }

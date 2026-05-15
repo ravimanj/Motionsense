@@ -168,13 +168,13 @@ class SetupActivity : AppCompatActivity() {
             val chip = TextView(this).apply {
                 text    = if (opt == 0) "BW" else opt.toString()
                 gravity = Gravity.CENTER
-                val dp8  = (8 * resources.displayMetrics.density).toInt()
-                val dp40 = (40 * resources.displayMetrics.density).toInt()
-                val dp60 = (60 * resources.displayMetrics.density).toInt()
-                setPadding(dp8, 0, dp8, 0)
-                minWidth = dp60
-                height   = dp40
-                textSize = 14f
+                val dp6  = (6 * resources.displayMetrics.density).toInt()
+                val dp38 = (38 * resources.displayMetrics.density).toInt()
+                val dp50 = (50 * resources.displayMetrics.density).toInt()
+                setPadding(dp6, 0, dp6, 0)
+                minWidth = dp50
+                height   = dp38
+                textSize = 13f
                 setTextColor(if (opt == defaultVal) Color.BLACK else Color.parseColor("#B0B0B0"))
                 background = if (opt == defaultVal)
                     getDrawable(R.drawable.bg_chip_selected)
@@ -183,9 +183,9 @@ class SetupActivity : AppCompatActivity() {
 
                 val params = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
-                    (40 * resources.displayMetrics.density).toInt()
-                ).apply { setMargins((6 * resources.displayMetrics.density).toInt(), 0,
-                    (6 * resources.displayMetrics.density).toInt(), 0) }
+                    (38 * resources.displayMetrics.density).toInt()
+                ).apply { setMargins((4 * resources.displayMetrics.density).toInt(), 0,
+                    (4 * resources.displayMetrics.density).toInt(), 0) }
                 layoutParams = params
             }
 

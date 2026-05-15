@@ -20,7 +20,7 @@ class ShoulderPressTracker:
         self.correct_reps   = 0
         self.incorrect_reps = 0
         self.form_errors    = set()
-        self.stage          = "down"   # "down" = arms lowered, "up" = arms extended
+        self.stage          = "up"   # "up" = arms overhead (pressed), "down" = arms lowered
         self._pose = make_pose()
 
     def process_frame(self, frame) -> dict:
@@ -84,11 +84,11 @@ class ShoulderPressTracker:
 
         rep_completed = False
 
-        # Bottom position (arms lowered)
+        # Arms fully lowered (bottom position)
         if elbow_angle < UP_THRESHOLD:
             self.stage = "down"
 
-        # Pressed to lockout → count rep
+        # Pressed to lockout (top position) → count rep
         elif elbow_angle > DOWN_THRESHOLD and self.stage == "down":
             self.stage = "up"
             self.counter += 1

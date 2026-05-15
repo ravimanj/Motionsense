@@ -24,6 +24,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
+import java.util.concurrent.atomic.AtomicBoolean
 
 class VideoTrackerActivity : AppCompatActivity() {
 
@@ -53,6 +54,10 @@ class VideoTrackerActivity : AppCompatActivity() {
     private val gson = Gson()
     private var frameJob: Job? = null
 
+    // Back-pressure guard: skip sending a new frame while the server is still
+    // processing the previous one. Prevents queue build-up and lag.
+    private val frameInFlight = AtomicBoolean(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityVideoTrackerBinding.inflate(layoutInflater)
@@ -79,6 +84,8 @@ class VideoTrackerActivity : AppCompatActivity() {
     }
 
     private var isUserPaused = false
+    private var isWsConnected = false
+    private var isVideoPrepared = false
 
     private fun setupUI() {
         binding.tvExerciseName.text   = exerciseName
@@ -110,6 +117,14 @@ class VideoTrackerActivity : AppCompatActivity() {
         binding.skeletonOverlay.isMirrored = false
     }
 
+    private fun checkAndStartVideo() {
+        if (isWsConnected && isVideoPrepared && !isUserPaused && mediaPlayer?.isPlaying == false) {
+            mediaPlayer?.start()
+            binding.btnPlayPause.text = "⏸ Pause"
+            if (frameJob?.isActive != true) startFrameExtraction()
+        }
+    }
+
     private fun setupVideoPlayer() {
         binding.textureView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
             override fun onSurfaceTextureAvailable(surfaceTexture: SurfaceTexture, width: Int, height: Int) {
@@ -119,13 +134,19 @@ class VideoTrackerActivity : AppCompatActivity() {
                         setDataSource(this@VideoTrackerActivity, videoUri!!)
                         setSurface(surface)
                         setOnPreparedListener {
-                            // Don't auto-start immediately; wait for WebSocket
-                            // But seek to frame 1 so it's not a black screen
+                            isVideoPrepared = true
                             it.seekTo(1)
                             binding.btnPlayPause.text = "▶ Play"
+                            checkAndStartVideo()
                         }
                         setOnCompletionListener {
-                            stopSession()
+                            // Wait for the last in-flight frame result before navigating.
+                            // Without this the final rep may not be counted.
+                            lifecycleScope.launch {
+                                frameJob?.cancel()
+                                delay(1500)
+                                stopSession()
+                            }
                         }
                         prepareAsync()
                     }
@@ -144,30 +165,53 @@ class VideoTrackerActivity : AppCompatActivity() {
         frameJob = lifecycleScope.launch(Dispatchers.IO) {
             while (isActive && mediaPlayer?.isPlaying == true) {
                 if (wsManager?.connected() == true) {
-                    try {
-                        val bitmap = binding.textureView.bitmap
-                        if (bitmap != null) {
-                            // Scale down to max 480px width to save bandwidth and prevent lag
-                            val maxWidth = 480
-                            val scale = maxWidth.toFloat() / bitmap.width
-                            val scaledHeight = (bitmap.height * scale).toInt()
-                            
-                            val scaledBitmap = Bitmap.createScaledBitmap(bitmap, maxWidth, scaledHeight, true)
-                            
-                            val out = ByteArrayOutputStream()
-                            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, Constants.JPEG_QUALITY, out)
-                            val b64 = Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP)
-                            
-                            // Send to WebSocket
-                            wsManager?.send("""{"frame":"$b64"}""")
-                            bitmap.recycle()
-                            scaledBitmap.recycle()
+                    if (frameInFlight.get()) {
+                        // Server hasn't replied yet — pause video so it doesn't
+                        // drift ahead of the analysis. Resume in handleFrameResult.
+                        runOnUiThread {
+                            if (mediaPlayer?.isPlaying == true) {
+                                mediaPlayer?.pause()
+                                binding.btnPlayPause.text = "⏸ Pause"
+                            }
                         }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Frame extraction error", e)
+                    } else {
+                        // Resume video if it was paused by back-pressure
+                        runOnUiThread {
+                            if (!isUserPaused && mediaPlayer?.isPlaying == false) {
+                                mediaPlayer?.start()
+                                binding.btnPlayPause.text = "⏸ Pause"
+                            }
+                        }
+                        try {
+                            val bitmap = binding.textureView.bitmap
+                            if (bitmap != null) {
+                                // 480px width: good landmark accuracy while keeping
+                                // payload small enough to send within 150ms.
+                                val maxWidth = Constants.FRAME_MAX_WIDTH
+                                val scale = maxWidth.toFloat() / bitmap.width
+                                val scaledHeight = (bitmap.height * scale).toInt()
+
+                                val scaledBitmap = Bitmap.createScaledBitmap(bitmap, maxWidth, scaledHeight, true)
+
+                                val out = ByteArrayOutputStream()
+                                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, Constants.JPEG_QUALITY, out)
+                                val b64 = Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP)
+
+                                frameInFlight.set(true)
+                                val sent = wsManager?.send("""{"frame":"$b64"}""")
+                                if (sent != true) {
+                                    frameInFlight.set(false)
+                                }
+
+                                bitmap.recycle()
+                                scaledBitmap.recycle()
+                            }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Frame extraction error", e)
+                            frameInFlight.set(false)
+                        }
                     }
                 }
-                // Throttle to roughly 10 FPS
                 delay(Constants.FRAME_INTERVAL_MS)
             }
         }
@@ -186,11 +230,8 @@ class VideoTrackerActivity : AppCompatActivity() {
                         binding.tvFeedback.text = "Analyzing video... \uD83E\uDD16"
                         binding.tvFeedback.setBackgroundColor(Color.parseColor("#1B5E20"))
                         
-                        if (!isUserPaused && mediaPlayer?.isPlaying == false) {
-                            mediaPlayer?.start()
-                            binding.btnPlayPause.text = "⏸ Pause"
-                            startFrameExtraction()
-                        }
+                        isWsConnected = true
+                        checkAndStartVideo()
                     }
                 }
 
@@ -224,6 +265,16 @@ class VideoTrackerActivity : AppCompatActivity() {
     }
 
     private fun handleFrameResult(json: String) {
+        // Server replied — clear the in-flight guard so the next frame can be sent.
+        // Also resume video if it was paused due to back-pressure.
+        frameInFlight.set(false)
+        if (!isUserPaused && mediaPlayer?.isPlaying == false) {
+            runOnUiThread {
+                mediaPlayer?.start()
+                binding.btnPlayPause.text = "⏸ Pause"
+            }
+        }
+
         try {
             val result = gson.fromJson(json, FrameResult::class.java)
 
